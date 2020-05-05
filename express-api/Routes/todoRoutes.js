@@ -50,7 +50,25 @@ router.post("/todo", (req, res) => {
       res.status(500).json({ error: true, message: "Could not post!" });
     });
 });
-// PUT / PATCH
+// PATCH
+router.patch("/todo/:id", (req, res) => {
+  TodoModel.findById(req.params.id, (err, result) => {
+    if (err) {
+      res.status(404).json({ error: true, message: "Could not PATCH todo" });
+    } else {
+      result.done = req.body.done;
+
+      result
+        .save()
+        .then((todo) => {
+          return res.status(200).json({ message: "Updated!", todo });
+        })
+        .catch((err) => {
+          return res.status(400).json({ error: true, message: `${err}` });
+        });
+    }
+  });
+});
 // DELETE
 
 router.delete("/todo/:id", (req, res) => {
@@ -59,6 +77,8 @@ router.delete("/todo/:id", (req, res) => {
       res.status(500).json({ error: true, message: "could not delete" });
     } else if (todo) {
       res.status(200).json({ message: "Successfully deleted", id: todo._id });
+    } else {
+      res.status(500).json({ error: true, message: "todo does not Exist" });
     }
   });
 });
